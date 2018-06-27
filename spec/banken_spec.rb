@@ -2,17 +2,18 @@ require "spec_helper"
 
 describe Banken do
   let(:user) { double }
+  let(:organization) { Organization.new(user, 1) }
   let(:post) { Post.new(user, 1) }
   let(:post2) { Post.new(user, 2) }
-  let(:comment) { Comment.new }
   let(:article) { Article.new }
-  let(:posts_controller) { PostsController.new(user, { :action => 'update', :controller => 'posts' }) }
+  let(:posts_controller) { PostsController.new(user, { :action => 'update', :controller => 'posts', organization: organization }) }
 
   describe ".loyalty!" do
     it "returns an instantiated loyalty given a controller name" do
-      loyalty = Banken.loyalty!('posts', user, post)
+      loyalty = Banken.loyalty!('posts', user, post, {organization: organization})
       expect(loyalty.user).to eq user
       expect(loyalty.record).to eq post
+      expect(loyalty.organization).to eq organization
       expect(loyalty.class.name).to eq 'PostsLoyalty'
     end
 
@@ -27,6 +28,14 @@ describe Banken do
       loyalty = Banken.loyalty!(:posts, user)
       expect(loyalty.user).to eq user
       expect(loyalty.record).to eq nil
+      expect(loyalty.class.name).to eq 'PostsLoyalty'
+    end
+
+    it "returns an instantiated loyalty given additional_conditions is nil" do
+      loyalty = Banken.loyalty!(:posts, user, post)
+      expect(loyalty.user).to eq user
+      expect(loyalty.record).to eq post
+      expect(loyalty.organization).to eq nil
       expect(loyalty.class.name).to eq 'PostsLoyalty'
     end
 

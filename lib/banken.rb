@@ -13,20 +13,22 @@ module Banken
     if respond_to?(:helper_method)
       helper_method :loyalty
       helper_method :banken_user
+      helper_method :banken_additional_conditions
     end
 
     if respond_to?(:hide_action)
       hide_action :permitted_attributes
       hide_action :loyalty
       hide_action :banken_user
+      hide_action :banken_additional_conditions
       hide_action :skip_authorization
       hide_action :verify_authorized
     end
   end
 
   class << self
-    def loyalty!(controller_name, user, record=nil)
-      LoyaltyFinder.new(controller_name).loyalty!.new(user, record)
+    def loyalty!(controller_name, user, record=nil, additional_condition={})
+      LoyaltyFinder.new(controller_name).loyalty!.new(user, record, additional_condition)
     end
   end
 
@@ -48,11 +50,15 @@ module Banken
 
   def loyalty(record=nil, controller_name=nil)
     controller_name = banken_controller_name unless controller_name
-    Banken.loyalty!(controller_name, banken_user, record)
+    Banken.loyalty!(controller_name, banken_user, record, banken_additional_conditions)
   end
 
   def banken_user
     current_user
+  end
+
+  def banken_additional_conditions
+    {}
   end
 
   def skip_authorization

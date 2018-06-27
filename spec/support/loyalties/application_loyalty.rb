@@ -1,9 +1,10 @@
 class ApplicationLoyalty
-  attr_reader :user, :record
+  attr_reader :user, :record, :organization
 
-  def initialize(user, record)
+  def initialize(user, record, additional_conditions={})
     @user = user
     @record = record
+    @organization = additional_conditions[:organization]
   end
 
   def index?
